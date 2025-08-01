@@ -1,10 +1,11 @@
 version: "3.8"
 
 services:
+  # API principale
   api:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./crud-api
+      dockerfile: crud-api/Dockerfile
     container_name: spring-api
     ports:
       - "8081:8080"
@@ -17,6 +18,7 @@ services:
     networks:
       - app-network
 
+  # Base de données dog
   db:
     image: mysql:8.0
     container_name: dog-db
@@ -30,8 +32,40 @@ services:
     networks:
       - app-network
 
+  # API des logs
+  api-logs:
+    build:
+      context: ./logs-api
+      dockerfile: logs-api/Dockerfile
+    container_name: spring-api-logs
+    ports:
+      - "8082:8080"
+    depends_on:
+      - log-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://log-db:3306/logdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+    networks:
+      - app-network
+
+  # Base de données des logs
+  log-db:
+    image: mysql:8.0
+    container_name: log-db
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: logdb
+    volumes:
+      - log-data:/var/lib/mysql
+    networks:
+      - app-network
+
 volumes:
   db-data:
+  log-data:
 
 networks:
   app-network:
