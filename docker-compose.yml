@@ -4,7 +4,7 @@ services:
   # API principale
   api:
     build:
-      context: ./crud-api
+      context: .
       dockerfile: crud-api/Dockerfile
     container_name: spring-api
     ports:
@@ -35,7 +35,7 @@ services:
   # API des logs
   api-logs:
     build:
-      context: ./logs-api
+      context: .
       dockerfile: logs-api/Dockerfile
     container_name: spring-api-logs
     ports:
